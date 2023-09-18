@@ -14,11 +14,14 @@ builder.Services.AddDbContext<StoreContext>(opt =>
     opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
+// We [Added] this so we can make [Calls/Requests] from are [client].
+
 using var scope = builder.Services.BuildServiceProvider().CreateScope();
 var context = scope.ServiceProvider.GetRequiredService<StoreContext>();
 var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
 DbInitializer.Initialize(context);
 
+builder.Services.AddCors();
 
 var app = builder.Build();
 
@@ -30,6 +33,12 @@ if (app.Environment.IsDevelopment())
 }
 
 //app.UseHttpsRedirection();
+
+app.UseCors(opt => 
+{
+    // This is to [allow] [requests] from other [origins]. for example this Origin ("localhost:3000")
+    opt.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:3000");
+});
 
 app.UseAuthorization();
 
