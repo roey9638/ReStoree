@@ -16,10 +16,10 @@ builder.Services.AddDbContext<StoreContext>(opt =>
 
 // We [Added] this so we can make [Calls/Requests] from are [client].
 
-using var scope = builder.Services.BuildServiceProvider().CreateScope();
-var context = scope.ServiceProvider.GetRequiredService<StoreContext>();
-var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
-DbInitializer.Initialize(context);
+// using var scope = builder.Services.BuildServiceProvider().CreateScope();
+// var context = scope.ServiceProvider.GetRequiredService<StoreContext>();
+// var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+// DbInitializer.Initialize(context);
 
 builder.Services.AddCors();
 
@@ -44,9 +44,15 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+
+var scope = app.Services.CreateScope();
+var context = scope.ServiceProvider.GetRequiredService<StoreContext>();
+var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+
 try
 {
     context.Database.Migrate();
+    DbInitializer.Initialize(context);
 }
 catch (Exception ex)
 {
