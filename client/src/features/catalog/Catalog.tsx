@@ -1,3 +1,5 @@
+import agent from "../../app/api/agent";
+import LoadingComponent from "../../app/layout/LoadingComponent";
 import { Product } from "../../app/models/product"
 import ProductList from "./ProductList";
 import { useState, useEffect } from "react";
@@ -6,19 +8,19 @@ import { useState, useEffect } from "react";
 export default function Catalog() {
 
     const [products, setProducts] = useState<Product[]>([]);
+    const [loading, setLoading] = useState(true);
 
     // This [useEffect] will be called (Once) when the [Component] first [Mounts]
     useEffect(() => {
-        //The [fetch] [return] a [Promise] which is [Baiscally] the [response]. Continue to [then]
-        fetch('http://localhost:5185/api/products')
-            // After the [fetch] we [convert] the [response] to a [Json] format so we could read it.
-            .then(response => response.json())
-            // And then we [take] the [data] that we got from the [response] after we [converted] it[Json] format. Continue DownVV
-            // And [Pass] it into are [setProducts] [state].
-            .then(data => setProducts(data))
-
+        agent.Catalog.list()
+            .then(products => setProducts(products))
+            .catch(error => console.log(error))
+            .finally(() => setLoading(false))
     }, [])
 
+    if (loading) {
+        return <LoadingComponent message='Loading products...' />
+    }
 
     return (
         <>
