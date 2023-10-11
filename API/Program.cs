@@ -40,7 +40,7 @@ if (app.Environment.IsDevelopment())
 app.UseCors(opt => 
 {
     // This is to [allow] [requests] from other [origins]. for example this Origin ("localhost:3000")
-    opt.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:3000");
+    opt.AllowAnyHeader().AllowAnyMethod().AllowCredentials().WithOrigins("http://localhost:3000");
 });
 
 app.UseAuthorization();

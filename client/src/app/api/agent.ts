@@ -6,6 +6,9 @@ const sleep = () => new Promise(resolve => setTimeout(resolve, 500));
 
 axios.defaults.baseURL = 'http://localhost:5185/api/';
 
+// This is for the [Browser] to [recive] the [cookie] And [set it] [inside] the [apllication storage] as well.
+axios.defaults.withCredentials = true; 
+
 const responseBody = (response: AxiosResponse) => response.data;
 
 axios.interceptors.response.use(async response => {
@@ -68,10 +71,18 @@ const TestErrors = {
 }
 
 
+const Basket = {
+    get: () => requests.get('basket'),
+    addItem: (productId: number, quantity = 1) => requests.post(`basket?productId=${productId}&quantity=${quantity}`, {}),
+    removeItem: (productId: number, quantity = 1) => requests.delete(`basket?productId=${productId}&quantity=${quantity}`),
+}
+
+
 // This is for that will be able to call [requests] from [Catalog] And [More!!!]
 const agent = {
     Catalog,
-    TestErrors
+    TestErrors,
+    Basket
 }
 
 export default agent;
