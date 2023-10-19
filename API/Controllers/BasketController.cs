@@ -50,7 +50,7 @@ namespace API.Controllers
 
             if (product == null)
             {
-                return NotFound();
+                return BadRequest(new ProblemDetails { Title = "Product not found" });
             }
 
             // [Roy] -> This is just call a [Function] from a [Service class] like other [projects]

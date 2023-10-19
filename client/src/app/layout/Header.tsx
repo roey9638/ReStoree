@@ -1,7 +1,7 @@
 import { ShoppingCart } from "@mui/icons-material";
 import { AppBar, Badge, Box, IconButton, List, ListItem, Switch, Toolbar, Typography } from "@mui/material";
 import { Link, NavLink } from "react-router-dom";
-import { useStoreContext } from "../context/StoreContext";
+import { useAppSelector } from "../store/configureStore";
 
 
 interface Props {
@@ -35,7 +35,8 @@ const navStyles = {
 
 export default function Header({ darkMode, handleThemeChange }: Props) {
 
-    const {basket} = useStoreContext();
+    // The [useAppSelector()] will [give us] the [state]. The [state] that [we want] in this [case] is [state.basket]
+    const {basket} = useAppSelector(state => state.basket);
 
     // The [reduce()] will go threw every single [item] in the [items array]
     // The [sum] will be [how much] we have from [each item]. And the [item] if for to know which [item].
