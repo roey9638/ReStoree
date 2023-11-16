@@ -2,6 +2,7 @@ import axios, { AxiosError, AxiosResponse } from "axios";
 import { toast } from "react-toastify";
 import { router } from "../router/Routes";
 import { PaginatedResponse } from "../models/pagination";
+import { store } from "../store/configureStore";
 
 const sleep = () => new Promise(resolve => setTimeout(resolve, 500));
 
@@ -11,6 +12,18 @@ axios.defaults.baseURL = 'http://localhost:5185/api/';
 axios.defaults.withCredentials = true;
 
 const responseBody = (response: AxiosResponse) => response.data;
+
+// Here I'm [making sure] that i'll [Send up] a [Toekn] with are [request]. Continue DownVV
+// [Only] if i [have] a [Token]. So if i [don't] habe a [Token] I will not [Add] the [Authorization] [Header] with any [Request]!!!
+axios.interceptors.request.use(config => {
+    // In order to use the [user] [object] from [getState()]. Continue DownVV
+    // Will need to make sure we have a [token] in [localStorage]
+    const token = store.getState().account.user?.token;
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+})
 
 axios.interceptors.response.use(async response => {
     await sleep();
@@ -85,11 +98,19 @@ const Basket = {
 }
 
 
+const Account = {
+    login: (values: any) => requests.post('account/login', values),
+    register: (values: any) => requests.post('account/register', values),
+    currentUser: () => requests.get('account/currentUser'),
+}
+
+
 // This is for that will be able to call [requests] from [Catalog] And [More!!!]
 const agent = {
     Catalog,
     TestErrors,
-    Basket
+    Basket,
+    Account
 }
 
 export default agent;

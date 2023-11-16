@@ -1,6 +1,7 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, isAnyOf } from "@reduxjs/toolkit";
 import { Basket } from "../../app/models/basket";
 import agent from "../../app/api/agent";
+import { getCookie } from "../../app/util/util";
 
 interface BasketState {
     basket: Basket | null;
@@ -12,6 +13,27 @@ const initialState: BasketState = {
     status: 'idle'
 }
 
+export const fetchBasketAsync = createAsyncThunk<Basket>(
+    'basket/fetchBasketAsync',
+    async (_, thunkAPI) => {
+        try {
+            return await agent.Basket.get();
+        } catch (error: any) {
+            return thunkAPI.rejectWithValue({error: error.data})
+        }
+    },
+    {
+        // This wil make sure that this [request] [agent.Basket.get()]. Continue DownVV
+        // Will [Happen] [Only If] we [Have] [something] in the [Browser] [Cookies]!!!
+        condition: () => {
+            if (!getCookie('buyerId')) {
+                return false;
+            }
+        }
+    }
+)
+
+//#region Comments
 // The [createAsyncThunk()] will [create] [actions] to do [stuff] in our [store]!!!!!!!!!
 // The [createAsyncThunk()] [needs] [(3) paramaters]!!!!!
 // The [First] [param] is what [type] are we [returning]. In this [case] is a [Basket]
@@ -20,6 +42,7 @@ const initialState: BasketState = {
 ////////////////////////////////////////////////////////////////
 // The [createAsyncThunk] is like an [Outer Function]
 // And what's [happening] [inside] is an [Inner function]. And in there we are [catching] the [error] [inside]
+//#endregion
 export const addBasketItemAsync = createAsyncThunk<Basket, {productId: number, quantity?: number}>(
     'basket/addBasketItemAsync',
     async ({productId, quantity = 1}, thunkAPI) => {
@@ -57,25 +80,17 @@ export const basketSlice = createSlice({
         // In the [UseEffect()] when we call the [dispatch(setBasket())] and [PASS] in the [basket]
         setBasket: (state, action) => {
             state.basket = action.payload
-        }     
+        },
+        
+        clearBasket : (state) => {
+            state.basket = null;
+        }
     },
     extraReducers: (builder => {
         // When the [addBasketItemAsync] [function] from [above] will be [called] will [make it] a [pending]
         builder.addCase(addBasketItemAsync.pending, (state, action) => {
             console.log(action);
             state.status = 'pendingAddItem' + action.meta.arg.productId;
-        });
-
-        // When the [addBasketItemAsync] [function] from [above] will be [finished]. Continue DownVV
-        // will [set] the [basket] for what we [getting] in the [return] of the [addBasketItemAsync] [function]
-        builder.addCase(addBasketItemAsync.fulfilled, (state, action) => {
-            state.basket = action.payload;
-            state.status = 'idle';
-        });
-
-        builder.addCase(addBasketItemAsync.rejected, (state, action) => {
-            console.log(action.payload);
-            state.status = 'idle';
         });
 
         // This Where the [removeBasketItem] Start!!!!!!!!!!!!!!!!!
@@ -103,7 +118,19 @@ export const basketSlice = createSlice({
             console.log(action.payload);
         });
 
+        // When the [addBasketItemAsync] [function] from [above] will be [finished]. Continue DownVV
+        // will [set] the [basket] for what we [getting] in the [return] of the [addBasketItemAsync] [function]
+        builder.addMatcher(isAnyOf(addBasketItemAsync.fulfilled, fetchBasketAsync.fulfilled), (state, action) => {
+            state.basket = action.payload;
+            state.status = 'idle';
+        });
+
+        builder.addMatcher(isAnyOf(addBasketItemAsync.rejected, fetchBasketAsync.rejected), (state, action) => {
+            console.log(action.payload);
+            state.status = 'idle';
+        });
+
     })
 })
 
-export const {setBasket} = basketSlice.actions;
+export const {setBasket, clearBasket} = basketSlice.actions;
