@@ -62,7 +62,7 @@ builder.Services.AddIdentityCore<User>(opt =>
     // I Added that -> [Maybe] will [need] to [Delete] this!!!
     opt.Password.RequireNonAlphanumeric = false;
 })
-    .AddRoles<IdentityRole>()
+    .AddRoles<Role>()
     .AddEntityFrameworkStores<StoreContext>();
 
 // Here I can [Authenticate] to the [API] And also [How] I'm [Authenticaten] to the [API].

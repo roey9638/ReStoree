@@ -74,7 +74,7 @@ namespace API.Controllers
         {
             // Here i [Creating] a new [user] with [UserName] and [Email]
             var user = new User { UserName = registerDto.Username, Email = registerDto.Email };
-    
+
             // Here I'm [Adding] the [Password] to the [Database] that the [user] [Input] to the new [user] we just [Created]
             var result = await _userManager.CreateAsync(user, registerDto.Password);
 
@@ -112,6 +112,17 @@ namespace API.Controllers
                 Token = await _tokenService.GenerateToken(user),
                 Basket = userBasket?.MapBasketToDto()
             };
+        }
+
+
+        [Authorize]
+        [HttpGet("savedAddress")]
+        public async Task<ActionResult<UserAddress>> GetSavedAddress()
+        {
+            return await _userManager.Users
+                .Where(x => x.UserName == User.Identity.Name)
+                .Select(user => user.Address)
+                .FirstOrDefaultAsync();
         }
 
 
