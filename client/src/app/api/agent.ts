@@ -113,13 +113,19 @@ const Orders = {
 }
 
 
+const Payments = {
+    createPaymentIntent: () => requests.post('payments', {})
+}
+
+
 // This is for that will be able to call [requests] from [Catalog] And [More!!!]
 const agent = {
     Catalog,
     TestErrors,
     Basket,
     Account,
-    Orders
+    Orders,
+    Payments
 }
 
 export default agent;

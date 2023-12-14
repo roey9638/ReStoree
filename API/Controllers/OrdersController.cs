@@ -22,6 +22,7 @@ namespace API.Controllers
             _context = context;
         }
 
+
         [HttpGet]
         public async Task<ActionResult<List<OrderDto>>> GetOrders()
         {
@@ -31,6 +32,7 @@ namespace API.Controllers
                 .ToListAsync();
         }
 
+
         [HttpGet("{id}", Name = "GetOrder")]
         public async Task<ActionResult<OrderDto>> GetOrder(int id)
         {
@@ -39,6 +41,7 @@ namespace API.Controllers
                 .Where(x => x.BuyerId == User.Identity.Name && x.Id == id)
                 .FirstOrDefaultAsync();
         }
+
 
         [HttpPost]
         public async Task<ActionResult<int>> CreateOrder(CreateOrderDto orderDto)
@@ -83,6 +86,7 @@ namespace API.Controllers
                 ShippingAddress = orderDto.ShippingAddress,
                 Subtotal = subtotal,
                 DeliveryFee = deliveryFee,
+                PaymentIntentId = basket.PaymentIntentId
             };
 
             _context.Orders.Add(order);

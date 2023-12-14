@@ -18,6 +18,8 @@ namespace API.Extensions
                 // Here will [map] the [basket] [properties] to the [new BasketDto]
                 Id = basket.Id,
                 BuyerId = basket.BuyerId,
+                PaymentIntentId = basket.PaymentIntentId,
+                ClientSecret = basket.ClientSecret,
                 // Here will [map] the [basketItems] [properties] from the [basket] to the [new BasketItemDto] that is a [list] [inside] the [new BasketDto]
                 Items = basket.Items.Select(item => new BasketItemDto
                 {
